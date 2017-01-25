@@ -11,9 +11,9 @@ const (
 )
 
 type ProfileTime struct {
-	Year int32 `bson:"year"`
-	Month int32 `bson:"month,omitempty"`
-	Day int32 `bson:"day,omitempty"`
+	Year int32 `bson:"year".json:"year"`
+	Month int32 `bson:"month,omitempty",json:"month,omitempty"`
+	Day int32 `bson:"day,omitempty",json:"day,omitempty"`
 }
 
 type ProfileSummary struct {

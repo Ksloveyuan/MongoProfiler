@@ -9,7 +9,6 @@ import (
 // Connect middleware clones the database session for each request and
 // makes the `db` object available for each handler
 func Connect(c *gin.Context) {
-	db.Connect()
 	s := db.Session.Clone()
 
 	defer s.Close()

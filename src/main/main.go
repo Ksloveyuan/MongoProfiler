@@ -1,6 +1,7 @@
 package main
 
 import (
+	"db"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"model"
@@ -12,6 +13,9 @@ import (
 
 
 func main() {
+
+	db.Connect()
+
 	r := gin.Default()
 
 	r.Use(middlewares.Connect)
@@ -38,7 +42,6 @@ func main() {
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, err.Error())
-			return
 		}else {
 			c.JSON(http.StatusOK, gin.H{"groupMethod": groupMethod, "statrDate": timeutil.ToString(startDate), "result": result})
 		}
