@@ -4,6 +4,7 @@ import (
 	"time"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"errors"
 )
 
 const (
@@ -47,14 +48,21 @@ func groupBy(groupID bson.M) bson.M {
 	}
 }
 
-func GetGroupID(groupMethod string) (bson.M, bool){
+func GetGroupID(groupMethod string) (bson.M, error){
+	var err error
+
 	groupIDMap := map[string] bson.M {
 		"byyear": {"year": "$year"},
 		"bymonth": {"year": "$year", "month": "$month"},
 		"byday": {"day":"$day", "month": "$month", "year": "$year"},
 	}
+
 	id,ok := groupIDMap[groupMethod]
-	return id,ok
+	if !ok {
+		err = errors.New("The group method is not supported")
+	}
+
+	return id,err
 }
 
 func Profile(db *mgo.Database, startDate time.Time, groupID bson.M) ([]ProfileSummary, error) {

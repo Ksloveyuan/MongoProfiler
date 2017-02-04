@@ -9,6 +9,8 @@ import (
 	"gopkg.in/mgo.v2"
 	"strings"
 	"timeutil"
+	"time"
+	"gopkg.in/mgo.v2/bson"
 )
 
 
@@ -22,29 +24,34 @@ func main() {
 	r.Use(middlewares.ErrorHandler)
 
 	r.GET("/profile/:groupMethod", func(c *gin.Context) {
-		groupMethod := strings.ToLower(c.Param("groupMethod"))
-		groupID, ok := model.GetGroupID(groupMethod)
 
-		if !ok {
-			c.JSON(http.StatusBadRequest, "The group method is not supported")
+		var groupID bson.M
+		var startDate time.Time
+		var result []model.ProfileSummary
+		var err error
+
+		groupMethod := strings.ToLower(c.Param("groupMethod"))
+
+		if groupID, err = model.GetGroupID(groupMethod); err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
 			return
 		}
 
-		startDate, err := timeutil.ParseDate(c)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, "Invalid time")
+		if startDate, err = timeutil.ParseDate(c); err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
 			return
 		}
 
 		db := c.MustGet("db").(*mgo.Database)
 
-		result,err := model.Profile(db, startDate, groupID)
+		result,err = model.Profile(db, startDate, groupID)
 
-		if err != nil {
+		if result,err = model.Profile(db, startDate, groupID); err != nil {
 			c.JSON(http.StatusBadRequest, err.Error())
-		}else {
-			c.JSON(http.StatusOK, gin.H{"groupMethod": groupMethod, "statrDate": timeutil.ToString(startDate), "result": result})
+			return
 		}
+
+		c.JSON(http.StatusOK, gin.H{"groupMethod": groupMethod, "statrDate": timeutil.ToString(startDate), "result": result})
 	})
 
 
