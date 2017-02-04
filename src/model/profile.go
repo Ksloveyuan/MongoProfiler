@@ -11,9 +11,9 @@ const (
 )
 
 type ProfileTime struct {
-	Year int32 `bson:"year".json:"year"`
-	Month int32 `bson:"month,omitempty",json:"month,omitempty"`
-	Day int32 `bson:"day,omitempty",json:"day,omitempty"`
+	Year *int32 `bson:"year" json:",omitempty"`
+	Month *int32 `bson:"month,omitempty" json:",omitempty"`
+	Day *int32 `bson:"day,omitempty" json:",omitempty"`
 }
 
 type ProfileSummary struct {
@@ -64,6 +64,7 @@ func Profile(db *mgo.Database, startDate time.Time, groupID bson.M) ([]ProfileSu
 	c := db.C(collectionProfile)
 
 	var result []ProfileSummary
+
 	err := c.Pipe(pipeline).All(&result)
 
 	return result, err
