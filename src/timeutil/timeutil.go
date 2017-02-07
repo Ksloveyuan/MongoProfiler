@@ -2,7 +2,6 @@ package timeutil
 
 import (
 	"time"
-	"github.com/gin-gonic/gin"
 )
 
 const TimeLayout  = "2006-1-2"

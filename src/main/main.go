@@ -27,20 +27,14 @@ func main() {
 		startDateString := c.DefaultQuery("startDate", timeutil.ToString(timeutil.LastYearOfToday()))
 		db := c.MustGet("db").(*mgo.Database)
 
-		profileRouter := router.ProfileRouter{
-			DB:db,
-			GroupMethod:groupMethod,
-			StartDateString:startDateString,
-		}
-
 		var result []model.ProfileSummary
 		var err error
 
-		if result, err = profileRouter.ProfileByGroupMethod(); err != nil{
+		if result, err = router.ProfileByGroupMethod(groupMethod,startDateString, db); err != nil{
 			c.JSON(http.StatusBadRequest, err.Error())
+		}else {
+			c.JSON(http.StatusOK, gin.H{"groupMethod": groupMethod, "statrDate": startDateString, "result": result})
 		}
-
-		c.JSON(http.StatusOK, gin.H{"groupMethod": groupMethod, "statrDate": startDateString, "result": result})
 	})
 
 
