@@ -11,6 +11,15 @@ const (
 	collectionProfile = "system.profile"
 )
 
+type Profiler interface {
+	Profile(groupMethod string, startDate time.Time) ([]ProfileSummary, error)
+}
+
+
+type MongoDataSource struct {
+	db *mgo.Database
+}
+
 type ProfileTime struct {
 	Year *int32 `bson:"year" json:",omitempty"`
 	Month *int32 `bson:"month,omitempty" json:",omitempty"`
@@ -18,9 +27,25 @@ type ProfileTime struct {
 }
 
 type ProfileSummary struct {
-	ID ProfileTime `bson:"_id"`
+	ID      ProfileTime `bson:"_id"`
 	TotalMS int32 `bson:"totalMS"`
-	AvgMS float32 `bson:"avgMS"`
+	AvgMS   float32 `bson:"avgMS"`
+}
+
+func NewMongoDataSource(db *mgo.Database) MongoDataSource  {
+	return MongoDataSource{db}
+}
+
+func (ds MongoDataSource) Profile(groupMethod string, startDate time.Time) ([]ProfileSummary, error)  {
+	var groupId bson.M
+	var err error
+	var result []ProfileSummary
+	if groupId, err = getGroupID(groupMethod); err!=nil {
+		return  result, err
+	}
+
+	return profile(ds.db, startDate, groupId)
+
 }
 
 func matchGreaterThan(startDate time.Time) bson.M{
@@ -48,7 +73,7 @@ func groupBy(groupID bson.M) bson.M {
 	}
 }
 
-func GetGroupID(groupMethod string) (bson.M, error){
+func getGroupID(groupMethod string) (bson.M, error){
 	var err error
 
 	groupIDMap := map[string] bson.M {
@@ -65,7 +90,7 @@ func GetGroupID(groupMethod string) (bson.M, error){
 	return id,err
 }
 
-func Profile(db *mgo.Database, startDate time.Time, groupID bson.M) ([]ProfileSummary, error) {
+func profile(db *mgo.Database, startDate time.Time, groupID bson.M) ([]ProfileSummary, error) {
 
 	pipeline := [] bson.M{matchGreaterThan(startDate), project(), groupBy(groupID)}
 

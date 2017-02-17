@@ -3,7 +3,6 @@ package db
 import (
 "fmt"
 "os"
-
 "gopkg.in/mgo.v2"
 )
 

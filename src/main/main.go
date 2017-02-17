@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"model"
 	"middlewares"
-	"gopkg.in/mgo.v2"
 	"strings"
 	"timeutil"
 	"router"
@@ -25,12 +24,13 @@ func main() {
 	r.GET("/profile/:groupMethod", func(c *gin.Context) {
 		groupMethod := strings.ToLower(c.Param("groupMethod"))
 		startDateString := c.DefaultQuery("startDate", timeutil.ToString(timeutil.LastYearOfToday()))
-		db := c.MustGet("db").(*mgo.Database)
+
+		applicationContext := router.NewApplicatonContext(c)
 
 		var result []model.ProfileSummary
 		var err error
 
-		if result, err = router.ProfileByGroupMethod(groupMethod,startDateString, db); err != nil{
+		if result, err = router.ProfileByGroupMethod(groupMethod,startDateString, applicationContext); err != nil{
 			c.JSON(http.StatusBadRequest, err.Error())
 		}else {
 			c.JSON(http.StatusOK, gin.H{"groupMethod": groupMethod, "statrDate": startDateString, "result": result})
