@@ -30,7 +30,7 @@ func main() {
 		var result []model.ProfileSummary
 		var err error
 
-		if result, err = router.ProfileByGroupMethod(groupMethod,startDateString, applicationContext); err != nil{
+		if result, err = router.ProfileByGroupMethod(groupMethod,startDateString, applicationContext.GetProfiler()); err != nil{
 			c.JSON(http.StatusBadRequest, err.Error())
 		}else {
 			c.JSON(http.StatusOK, gin.H{"groupMethod": groupMethod, "statrDate": startDateString, "result": result})

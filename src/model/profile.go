@@ -48,6 +48,23 @@ func (ds MongoDataSource) Profile(groupMethod string, startDate time.Time) ([]Pr
 
 }
 
+func getGroupID(groupMethod string) (bson.M, error){
+	var err error
+
+	groupIDMap := map[string] bson.M {
+		"byyear": {"year": "$year"},
+		"bymonth": {"year": "$year", "month": "$month"},
+		"byday": {"day":"$day", "month": "$month", "year": "$year"},
+	}
+
+	id,ok := groupIDMap[groupMethod]
+	if !ok {
+		err = errors.New("The group method is not supported")
+	}
+
+	return id,err
+}
+
 func matchGreaterThan(startDate time.Time) bson.M{
 	return bson.M{"$match": bson.M{"ts": bson.M{"$gt": startDate}}}
 }
@@ -71,23 +88,6 @@ func groupBy(groupID bson.M) bson.M {
 			"avgMS": bson.M{"$avg": "$millis"},
 		},
 	}
-}
-
-func getGroupID(groupMethod string) (bson.M, error){
-	var err error
-
-	groupIDMap := map[string] bson.M {
-		"byyear": {"year": "$year"},
-		"bymonth": {"year": "$year", "month": "$month"},
-		"byday": {"day":"$day", "month": "$month", "year": "$year"},
-	}
-
-	id,ok := groupIDMap[groupMethod]
-	if !ok {
-		err = errors.New("The group method is not supported")
-	}
-
-	return id,err
 }
 
 func profile(db *mgo.Database, startDate time.Time, groupID bson.M) ([]ProfileSummary, error) {
