@@ -9,6 +9,7 @@ import (
 	"strings"
 	"timeutil"
 	"router"
+	"fmt"
 )
 
 
@@ -30,7 +31,10 @@ func main() {
 		var result []model.ProfileSummary
 		var err error
 
-		if result, err = router.ProfileByGroupMethod(groupMethod,startDateString, applicationContext.GetProfiler()); err != nil{
+		profiler := applicationContext.GetProfiler()
+
+		if result, err = router.ProfileByGroupMethod(groupMethod,startDateString, profiler); err != nil{
+			fmt.Println("An error happens: %+v", err)
 			c.JSON(http.StatusBadRequest, err.Error())
 		}else {
 			c.JSON(http.StatusOK, gin.H{"groupMethod": groupMethod, "statrDate": startDateString, "result": result})

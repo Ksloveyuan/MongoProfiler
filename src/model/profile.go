@@ -4,7 +4,7 @@ import (
 	"time"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"errors"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -59,7 +59,7 @@ func getGroupID(groupMethod string) (bson.M, error){
 
 	id,ok := groupIDMap[groupMethod]
 	if !ok {
-		err = errors.New("The group method is not supported")
+		errors.Errorf("The group method(%s) is not supported.", groupMethod)
 	}
 
 	return id,err
@@ -99,6 +99,10 @@ func profile(db *mgo.Database, startDate time.Time, groupID bson.M) ([]ProfileSu
 	var result []ProfileSummary
 
 	err := c.Pipe(pipeline).All(&result)
+
+	if err != nil {
+		err = errors.Wrapf(err, "Some unexpected errrors happen, pleasea contact the webstie administrator for support.")
+	}
 
 	return result, err
 }
