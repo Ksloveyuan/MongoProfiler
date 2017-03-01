@@ -34,7 +34,7 @@ func main() {
 		profiler := applicationContext.GetProfiler()
 
 		if result, err = router.ProfileByGroupMethod(groupMethod,startDateString, profiler); err != nil{
-			fmt.Println("An error happens: %+v", err)
+			fmt.Println("%+v\n", err)
 			c.JSON(http.StatusBadRequest, err.Error())
 		}else {
 			c.JSON(http.StatusOK, gin.H{"groupMethod": groupMethod, "statrDate": startDateString, "result": result})

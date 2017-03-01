@@ -10,7 +10,7 @@ func ProfileByGroupMethod(groupMethod string, startDateString string, profiler m
 
 	startDate, err := timeutil.ParseDate(startDateString)
 
-	if err != nil {
+	if  err == nil {
 		result, err = profiler.Profile(groupMethod, startDate)
 	}
 

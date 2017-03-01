@@ -58,8 +58,9 @@ func getGroupID(groupMethod string) (bson.M, error){
 	}
 
 	id,ok := groupIDMap[groupMethod]
+
 	if !ok {
-		errors.Errorf("The group method(%s) is not supported.", groupMethod)
+		err = errors.Errorf("The group method(%s) is not supported.", groupMethod)
 	}
 
 	return id,err
